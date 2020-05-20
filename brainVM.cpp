@@ -111,19 +111,47 @@ void brainVM::execute() {
 		}
 
 		case 0x09: {
-			tape[mp] += 4;
+			tape[mp] += program[ip+1];
+			ip++;
 			break;
 		}
 
 		case 0x0A: {
-			tape[mp] -= 4;
+			tape[mp] -= program[ip+1];
+			ip++;
+			break;
+		}
+
+		case 0x0B: {
+			mp += program[ip + 1];
+			while (mp > hv) {
+				hv++;
+				tape.push_back(0);
+			}
+			ip++;
+			break;
+		}
+
+		case 0x0C: {
+			mp -= program[ip + 1];
+			if (mp < 0) {
+				std::cout << "[ERROR] entered negative area of tape";
+				exit(1);
+			}
+			ip++;
+			break;
+		}
+
+		default: {
+			std::cout << "[ERROR] illegal opcode: " << (int)program[ip];
+			exit(1);
 		}
 
 
 		}
 	}
-	printState();
-	//std::cout << "\nexecution took " << steps << " steps";
+	//printState();
+	std::cout << "\nexecution took " << steps << " steps";
 }
 
 void brainVM::printState()
@@ -159,9 +187,38 @@ void brainVM::replaceSequence(std::vector<uint8_t> seq, uint8_t with) {
 	}
 }
 
+void brainVM::optimizeRepeating(uint8_t repeater, uint8_t with, std::vector<uint8_t> multichars) {
+	for (unsigned int i = 0; i < program.size(); i++) {
+		bool skipping = false;
+		for (unsigned int j = 0; j < multichars.size(); j++) {
+			if (program[i] == multichars[j]) {
+				i+=2;
+			}
+		}
+		if (skipping) {
+			continue;
+		}
+
+		if (program[i] == repeater && program[i + 1] == repeater) {
+			program[i] = with;
+			char count = 2;
+			while (program[i+2] == repeater) {
+				program.erase(program.begin() + i + 2);
+				count++;
+				if (i + 2 == program.size()) {
+					program[i + 1] = count;
+					return;
+				}
+			}
+			program[i + 1] = count;
+		}
+	}
+}
+
 void brainVM::optimize() {
 	replaceSequence({0x06, 0x01, 0x07}, 0x08);// [-] set current cell to 0
-	//replaceSequence({ 0x00, 0x00, 0x00, 0x00}, 0x09);// ++++ add 4 to current
-	//replaceSequence({ 0x01, 0x01, 0x01, 0x01}, 0x0A);// ---- subtract 4 from current
+	optimizeRepeating(0x00, 0x09, {});
+
+	
 }
 

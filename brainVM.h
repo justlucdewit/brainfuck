@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <iomanip>
 
 class brainVM {
 public:
@@ -17,6 +18,7 @@ public:
 	brainVM(std::string p);
 
 	void replaceSequence(std::vector<uint8_t> seq, uint8_t with);
+	void optimizeRepeating(uint8_t repeater, uint8_t with, std::vector<uint8_t> multichars);
 
 	void optimize();
 	void execute();
