@@ -1,0 +1,7 @@
+﻿  brainVM.cpp
+  Generating code
+  6 of 286 functions ( 2.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    3 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  Brainfuck.vcxproj -> D:\programming\cpp\Brainfuck\Brainfuck\Release\Brainfuck.exe
